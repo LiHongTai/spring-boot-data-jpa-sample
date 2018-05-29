@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 //注解@RestController是 @Controller 和 @ResponseBody 注解的结合体
 @RestController
@@ -42,6 +43,11 @@ public class DeptController {
     }
 
     @GetMapping(value = "update/{id}")
+    //事务默认情况下，RuntimeException及其子类事务会回归
+    // 但是 ParseException异常时Exception的子类，
+    // 故如果想要所有异常都要回滚事务
+    // 则需要 添加 rollbackOn = Exception.class
+    @Transactional(rollbackOn = Exception.class)
     public Dept update(@PathVariable("id") Integer id){
         Dept dept = null;
         Optional<Dept> optionalDept = deptRepository.findById(id);
